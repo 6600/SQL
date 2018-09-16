@@ -1,0 +1,4 @@
+2018-09-16 22:43:02,072 - app.py[line:33] - INFO: this is a logger info message
+2018-09-16 22:43:02,072 - app.py[line:34] - WARNING: this is a logger warning message
+2018-09-16 22:43:02,072 - app.py[line:35] - ERROR: this is a logger error message
+2018-09-16 22:43:02,072 - app.py[line:36] - CRITICAL: this is a logger critical message

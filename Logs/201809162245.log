@@ -1,0 +1,4 @@
+2018-09-16 22:45:07,285 - INFO: this is a logger info message
+2018-09-16 22:45:07,285 - WARNING: this is a logger warning message
+2018-09-16 22:45:07,285 - ERROR: this is a logger error message
+2018-09-16 22:45:07,286 - CRITICAL: this is a logger critical message
