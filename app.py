@@ -4,6 +4,7 @@
 import logging  # 引入logging模块
 import os
 import time
+import json
 import requests
 
 # 第一步，创建一个logger
@@ -37,5 +38,33 @@ logger.addHandler(fh)
 # logger.error('this is a logger error message')
 # logger.critical('this is a logger critical message')
 
-r = requests.get('http://127.0.0.1:8775/task/new')
-print(r.text)
+# 创建任务
+# r = requests.get('http://127.0.0.1:8775/task/new')
+# if r.status_code == requests.codes.ok:
+#   if r.json()['success']:
+#     # 启动
+#     taskid = r.json()['taskid']
+#     my_data = {
+#       'url': 'http://140.143.207.13:9001/tail.html?processname=DataV-mock'
+#     }
+#     # 设置扫描url
+#     cs_url = 'http://127.0.0.1:8775/option/' + taskid + '/set'
+#     r = requests.post (cs_url, data = json.dumps(my_data), headers={'Content-Type': 'application/json'})
+#     if r.status_code == requests.codes.ok:
+#       if r.json()['success']:
+#         cs_url = 'http://127.0.0.1:8775/scan/' + taskid + '/start'
+#         r = requests.post (cs_url, data = json.dumps({}), headers={'Content-Type': 'application/json'})
+#         if r.status_code == requests.codes.ok:
+#           if r.json()['success']:
+#             print(r.text)
+#           else:
+#             logger.error('启动任务失败!')
+#       else:
+#         logger.error(r.json()['message'])
+#   else:
+#     logger.error('新建任务失败!')
+
+# 查询状态
+r = requests.get('http://127.0.0.1:8775/scan/dd69213bd10a74fb/data')
+if r.status_code == requests.codes.ok:
+  print(r.text)
