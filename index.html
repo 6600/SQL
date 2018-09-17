@@ -1,0 +1,98 @@
+<html>
+<head>
+  <title>我的服务器</title>
+  <meta charset="UTF-8">
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport" />
+  <style>
+    body, html {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+    .page__bd {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+  <link rel="stylesheet" href="//res.wx.qq.com/open/libs/weui/1.1.3/weui.min.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+</head>
+<body>
+  <div id="app" class="page">
+    <div class="page__bd">
+      <div class="weui-cells__title">测试Url:</div>
+      <div class="weui-cells">
+        <div class="weui-cell">
+          <div class="weui-cell__bd">
+            <input class="weui-input" v-model="url" type="text" placeholder="请输入预测试URL">
+          </div>
+        </div>
+      </div>
+      <div class="weui-btn-area" @click="creat">
+        <a class="weui-btn weui-btn_primary" href="javascript:" id="showTooltips">创建</a>
+      </div>
+      <div class="weui-btn-area">
+        <a class="weui-btn weui-btn_primary" href="javascript:" id="showTooltips">获取结果</a>
+      </div>
+      <div class="weui-cells weui-cells_form">
+        <div class="weui-cell">
+          <div class="weui-cell__bd">
+            <textarea class="weui-textarea" placeholder="请输入文本" rows="3"></textarea>
+            <div class="weui-textarea-counter"><span>0</span>/200</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 因为服务器只有一个 微信除了80端口以外的页面会被区别对待 所以写成绝对路径
+    let app = new Vue({
+      el: '#app',
+      data: {
+        url: ''
+      },
+      methods: {
+        creat () {
+          const data = {
+            url: this.url
+          }
+          $post('http://140.143.207.13:5005/creatScan', JSON.stringify(data), (res) => {
+            console.log(res)
+          })
+        }
+      }
+    })
+    function $get (url, fn){
+      const obj = new XMLHttpRequest()        
+      obj.open('GET', url, true)
+      obj.onreadystatechange = function(){
+        if (obj.readyState === 4 && obj.status === 200 || obj.status === 304) {
+          if (fn) fn.call(this, JSON.parse(obj.responseText))
+        }
+      }
+      obj.send(null)
+    }
+    function $post (url, data, fn) {
+      const ajax = new XMLHttpRequest();
+      // 使用post请求
+      ajax.open('post', url)
+
+      // 如果 使用post发送数据 必须 设置 如下内容
+      // 修改了 发送给 服务器的 请求报文的 内容
+      // 如果需要像 HTML 表单那样 POST 数据，请使用 setRequestHeader() 来添加 HTTP 头。然后在 send() 方法中规定您希望发送的数据：
+      ajax.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+      // 发送
+      // post请求 发送的数据 写在 send方法中
+      // 格式 name=jack&age=18 字符串的格式
+      ajax.send(data);
+      // 注册事件
+      ajax.onreadystatechange = function () {
+        if (ajax.readyState == 4 && ajax.status == 200) {
+          if (fn) fn.call(this, JSON.parse(obj.responseText))
+        }
+      }
+    }
+  </script>
+</body>
+</html>
