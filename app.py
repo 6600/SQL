@@ -6,6 +6,8 @@ import os
 import time
 import json
 import requests
+from flask import Flask, request
+app = Flask(__name__)
 
 # 第一步，创建一个logger
 logger = logging.getLogger()
@@ -39,32 +41,50 @@ logger.addHandler(fh)
 # logger.critical('this is a logger critical message')
 
 # 创建任务
-# r = requests.get('http://127.0.0.1:8775/task/new')
-# if r.status_code == requests.codes.ok:
-#   if r.json()['success']:
-#     # 启动
-#     taskid = r.json()['taskid']
-#     my_data = {
-#       'url': 'http://140.143.207.13:9001/tail.html?processname=DataV-mock'
-#     }
-#     # 设置扫描url
-#     cs_url = 'http://127.0.0.1:8775/option/' + taskid + '/set'
-#     r = requests.post (cs_url, data = json.dumps(my_data), headers={'Content-Type': 'application/json'})
-#     if r.status_code == requests.codes.ok:
-#       if r.json()['success']:
-#         cs_url = 'http://127.0.0.1:8775/scan/' + taskid + '/start'
-#         r = requests.post (cs_url, data = json.dumps({}), headers={'Content-Type': 'application/json'})
-#         if r.status_code == requests.codes.ok:
-#           if r.json()['success']:
-#             print(r.text)
-#           else:
-#             logger.error('启动任务失败!')
-#       else:
-#         logger.error(r.json()['message'])
-#   else:
-#     logger.error('新建任务失败!')
+def creatScan(url):
+  r = requests.get('http://127.0.0.1:8775/task/new')
+  if r.status_code == requests.codes.ok:
+    if r.json()['success']:
+      # 启动
+      taskid = r.json()['taskid']
+      my_data = {
+        'url': url
+      }
+      # 设置扫描url
+      cs_url = 'http://127.0.0.1:8775/option/' + taskid + '/set'
+      r = requests.post (cs_url, data = json.dumps(my_data), headers={'Content-Type': 'application/json'})
+      if r.status_code == requests.codes.ok:
+        if r.json()['success']:
+          cs_url = 'http://127.0.0.1:8775/scan/' + taskid + '/start'
+          r = requests.post (cs_url, data = json.dumps({}), headers={'Content-Type': 'application/json'})
+          if r.status_code == requests.codes.ok:
+            jsonData = r.json()
+            if jsonData['success']:
+              jsonData['taskid'] = taskid
+              print(jsonData)
+              return json.dumps(jsonData)
+            else:
+              return r.text
+        else:
+          logger.error(r.json()['message'])
+          return r.text
+    else:
+      logger.error('新建任务失败!')
+      return '{ "message": "Creat scan failed", "success": false }'
 
 # 查询状态
-r = requests.get('http://127.0.0.1:8775/scan/dd69213bd10a74fb/data')
-if r.status_code == requests.codes.ok:
-  print(r.text)
+@app.route('/getStatus/<id>')
+def getStatus(id):
+  r = requests.get('http://127.0.0.1:8775/scan/' + id + '/data')
+  if r.status_code == requests.codes.ok:
+    return r.text
+
+@app.route('/creatScan', methods = ['POST'])
+def creatScan():
+  jsonData = json.loads(request.get_data())
+  if (jsonData, jsonData['url']):
+    return creatScan(jsonData['url'])
+  return '{ "message": "Parameter error", "success": false }'
+
+if __name__ == '__main__':
+  app.run(host='0.0.0.0', port=5005)
