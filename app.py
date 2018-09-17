@@ -9,6 +9,7 @@ import requests
 from flask import Flask, request
 app = Flask(__name__)
 
+
 # 第一步，创建一个logger
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)  # Log等级总开关
@@ -39,6 +40,12 @@ logger.addHandler(fh)
 # logger.warning('this is a logger warning message')
 # logger.error('this is a logger error message')
 # logger.critical('this is a logger critical message')
+
+# 设置跨域
+def after_request(response):
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    return response
+app.after_request(after_request)
 
 # 创建任务
 def creatScan(url):
@@ -76,8 +83,7 @@ def creatScan(url):
 @app.route('/getStatus/<id>')
 def getStatus(id):
   r = requests.get('http://127.0.0.1:8775/scan/' + id + '/data')
-  if r.status_code == requests.codes.ok:
-    return r.text
+  return r.text
 
 @app.route('/creatScan', methods = ['POST'])
 def creatScan():
