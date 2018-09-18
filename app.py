@@ -88,6 +88,7 @@ def getStatus(id):
 @app.route('/creatScan', methods = ['POST'])
 def creatScan():
   jsonData = json.loads(request.get_data())
+  printf(jsonData)
   if (jsonData, jsonData['url']):
     return creatScan(jsonData['url'])
   return '{ "message": "Parameter error", "success": false }'
