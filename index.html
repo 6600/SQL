@@ -13,6 +13,10 @@
       width: 100%;
       height: 100%;
     }
+    .panel {
+      margin: 0 10px;
+      height: calc(100% - 152px);
+    }
   </style>
   <link rel="stylesheet" href="//res.wx.qq.com/open/libs/weui/1.1.3/weui.min.css"/>
   <script src="https://cdn.jsdelivr.net/npm/vue"></script>
@@ -28,19 +32,9 @@
           </div>
         </div>
       </div>
+      <pre class="panel">{{result}}</pre>
       <div class="weui-btn-area" @click="creat">
         <a class="weui-btn weui-btn_primary" href="javascript:" id="showTooltips">创建</a>
-      </div>
-      <div class="weui-btn-area">
-        <a class="weui-btn weui-btn_primary" href="javascript:" id="showTooltips">获取结果</a>
-      </div>
-      <div class="weui-cells weui-cells_form">
-        <div class="weui-cell">
-          <div class="weui-cell__bd">
-            <textarea class="weui-textarea" placeholder="请输入文本" rows="3"></textarea>
-            <div class="weui-textarea-counter"><span>0</span>/200</div>
-          </div>
-        </div>
       </div>
     </div>
   </div>
@@ -49,8 +43,12 @@
     // 因为服务器只有一个 微信除了80端口以外的页面会被区别对待 所以写成绝对路径
     let app = new Vue({
       el: '#app',
-      data: {
-        url: ''
+      data () {
+        return {
+          url: '',
+          taskid: '',
+          result: ''
+        }
       },
       methods: {
         creat () {
@@ -58,7 +56,20 @@
             url: this.url
           }
           $post('http://140.143.207.13:5005/creatScan', JSON.stringify(data), (res) => {
-            console.log(res)
+            this.taskid = res.taskid
+            console.log(res, res.taskid)
+            setTimeout(() => {
+              this.startGetData(res.taskid)
+            }, 2000)
+          })
+        },
+        startGetData (taskid) {
+          console.log(taskid)
+          $get(`http://140.143.207.13:5005/getStatus/${taskid}`, (res) => {
+            if (res.success) {
+              console.log('收到返回数据:', res)
+              this.result = JSON.stringify(res)
+            }
           })
         }
       }
@@ -89,7 +100,7 @@
       // 注册事件
       ajax.onreadystatechange = function () {
         if (ajax.readyState == 4 && ajax.status == 200) {
-          if (fn) fn.call(this, JSON.parse(obj.responseText))
+          if (fn) fn.call(this, JSON.parse(ajax.responseText))
         }
       }
     }
